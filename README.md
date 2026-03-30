@@ -86,7 +86,7 @@ Insctruction format.
 
 Opcodes.
 
-0) ALU REG, REG (2 Register operations) Ex could be used for extentions 
+0) ALU REG, REG (2 Register operations) 
 ```
 	Ex(0 bit) - register bank for Rd
 	Ex(1 bit) - register bank for Rs
