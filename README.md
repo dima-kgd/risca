@@ -121,7 +121,7 @@ Opcodes.
 	func(0-1 bits):
 		0) ADD/SUB: Rd = Rd + (signed(IMM))
 		1) SHL/SHR: Rd = << or >> signed(IMM & 31)
-		2) LDI Rd = PC - IMM; get 32 bit address relative to PC, IMM in instructions (-128 ... 0 instructions)
+		2) LDI Rd = [PC - IMM]; load 32 bit from address relative to PC, IMM in instructions (-128 ... 0 instructions)
 		3) DJNZ Rd, PC + signed(IMM); Rd-- if not zero, jump taken. IMM in instructions (-64 ... +63 instructions)
 ```
 
