@@ -1,208 +1,170 @@
-# RiscA
-RiscA 32 bit processor.
-
-Risc A(Basic) 32 bit processor with 32 bit address bus and 32 bit data bus.
+## Risc-A CPU. 
+Simple RISC architecture aimed to run several instructions in parrallel(IMEM, MEM, ALU, BRANCH).
 
 Byte order: Little-Endian.
 
-ALU: add, sub, shl, shr, and, or, xor
+Bus is 32 bit, Instructions 16 bit. 2 instructions in 32 bit. Constants aligment for LDI always 2 bytes (in instructions). Function alligment is 4 bytes (for CALL)
 
-Insructions: all 16 bit. Fetching from memory 2 instructions at once as data bus is 32 bit.
+General purpose registers 32 bit: R0-R15
 
-16 General Purpose Registers (32 bit):
-```
-	R0 - R15
-	Bank 0: R0 - R7 (all opcodes)
-	Bank 1: R8 - R15 (extended; only 0, 2, 3 opcodes)
-```
-2 Hidden registers (not banked):
-```
-	LR - link register, available to load\restore using common registers
-	SP - stack pointer, available to load\restore using common registers
-```
+## Instruction table
 
-RiscA could execute some operations simultaneously (Dual-Issue (ALU + MEM),(ALU + ALU)), if target registers in different reg bank.
+| Opcode (3 bits) | Type        | Format (16 bit)                                  | Description |
+| --------------- | ----------- | ------------------------------------------------ | ----------- |
+| 0               | [ALU REG REG](#alu-reg-reg) | ```notused(2)       func3(3)  Rs(4) Rd(4) opcode(3)``` | MOV,ADD,SUB,AND,OR,XOR,NOT,MUL|
+| 1               | [ALU Imm](#alu-imm)         | ```Imm(7)           func2(2)        Rd(4) opcode(3)``` | SHR,SHL,ADD,SUB |
+| 2               | [REG Imm](#reg-imm)         | ```Imm(8)           func1(1)        Rd(4) opcode(3)``` | MOVI,MOVH |
+| 3               | [ST\LD](#stld)              | ```Imm(3) func22(1) func21(1) Rs(4) Rd(4) opcode(3)``` | LDB,LDW,STB,STW |
+| 4               | [BRANCH](#branch)           | ```Imm(7)           func2(2)        Rd(4) opcode(3)``` | BEQZ,BNEZ,BGTZ,BLTZ |
+| 5               | [LDI](#ldi)                 | ```Imm(9)                           Rd(4) opcode(3)``` | Load indirect 32 bit constant |
+| 6               | [CALL\JMP\RET](#calljmpret) | ```Imm(7)           func2(2)        Rd(4) opcode(3)``` | CALL,JMP,RET |
+| 7               | [INT\RETI\STS](#intretists) | ```unused(7)        func2(2)        Rd(4) opcode(3)``` | INT,RETI,STS |
 
-Example:
-```
-		LD.0 R0, 0xFF
-		LD.D R8, [R1]
-	or
-		LD.0 R1,0x05
-		ADD  R9,0x01
-```
 
-Current program pointer: PC
 
-Mem copy sample (R2 source, R3 target, R4 size)
+## Instructions
+
+### ALU REG REG:
+Opcode: 0
+
 ```
-loop:
-	LD.B R0, [R2++]
-	ST.B [R3++], R0
-	DJNZ R4, loop
+notused(2) | func3(3) | Rs(4) | Rd(4) | opcode(3)
 ```
 
-Insctruction format.
+	NOP is MOV R0, R0 - 0x0000 hex
+	func3:
 
-1) 2 Register operations
-```
-+--------+- ------+------------+-------+-----------+
-|15 14 13| 12 11  | 10 9 8 7 6 | 5 4 3 | 2 1 0     |
-| Rs(3)  | Ex(2)  | func(5)    | Rd(3) | opcode(3) |
-+--------+--------+------------+-------+-----------+
-```
+	0) MOV Rd, Rs; Rd = Rs
+	1) ADD Rd, Rs; Rd = Rd + Rs
+	2) SUB Rd, Rs; Rd = Rd - Rs
+	3) AND Rd, Rs; Rd = Rd and Rs
+	4) OR  Rd, Rs; Rd = Rd or  Rs
+	5) XOR Rd, Rs; Rd = Rd xor Rs
+	6) NOT Rd, Rs; Rd = ~Rs
+	7) MUL Rd, Rs; Rd = Rd * Rs
+	7?) CMP Rd, Rs; R13 = (Rd == Rs) ? 0 : (Rd < Rs) -1 : (Rd > Rs) 1
+	
+### ALU Imm:
+Opcode: 1
 
-3) 3 Register operations
 ```
-+--------+------+--------+-------+-------+-----------+
-|15 14 13| 12 11| 10 9   | 8 7 6 | 5 4 3 | 2 1 0     |
-| Rs(3)  | Ex(2)| func(2)| Rx(3) | Rd(3) | opcode(3) |
-+--------+------+--------+-------+-------+-----------+
-```
-
-4) 7 bit Immediate operations
-```
-+--------------------+---------+-------+-----------+
-|15 14 13 12 11 10 9 | 8 7 6   | 5 4 3 | 2 1 0     |
-|        Number(7)   | func(3) | Rd(3) | opcode(3) |
-+--------------------+---------+-------+-----------+
+Imm(7) | func2(2) | Rd(4) | opcode(3)
 ```
 
-5) 8 bit Immediate operations
+	func2:
+
+		0) SHL Rd, Imm(4); Rd = Rd << Imm(0-3 bits)
+		1) SHR Rd, Imm(4); Rd = Rd >> Imm(0-3 bits); Logical - fills 0 on the left
+		2) ADD Rd, Imm(7); Rd = Rd + Imm(7)
+		3) SUB Rd, Imm(7); Rd = Rd - Imm(7)
+
+### REG Imm:
+Opcode: 2
+
 ```
-+----------------------+-------+-------+-----------+
-|15 14 13 12 11 10 9 8 | 7 6   | 5 4 3 | 2 1 0     |
-|        Number(8)     |func(2)| Rd(3) | opcode(3) |
-+----------------------+-------+-------+-----------+
+Imm(8) | func1(1) | Rd(4) | opcode(3)
 ```
 
-6) 13 bit Immediate operations
+	func1:
+
+		0) MOVI Rd, Imm(8); Rd = 0(24) Imm(8)
+		1) MOVH Rd, Imm(8); Rd = Rd | (Imm(8) << 8)
+
+	MOVI and MOVH used to load 8 or 16 bit constants
+
+### ST\LD:
+Opcode: 3
+
 ```
-+--------------------------------------+-----------+
-|15 14 13 12 11 10 9 8   7 6     5 4 3 | 2 1 0     |
-|        Number(13)                    | opcode(3) |
-+--------------------------------------+-----------+
+Imm(3) | func22(1) | func21(1) |  Rs(4) |  Rd(4) | opcode(3)
 ```
 
-Opcodes.
+	For Word acceess used Imm(3)<<2
+	func21:
 
-0) ALU REG, REG (2 Register operations) 
+	0) LD Rd, [Rs+Imm(3)]; LDW or LDB 
+	1) ST [Rs+Imm(3)], Rd; STW or STB
+	func22:
+	0) Byte access
+	1) Word acceess (32 bit)
+
+### BRANCH:
+Opcode: 4
+
 ```
-	Ex(0 bit) - register bank for Rd
-	Ex(1 bit) - register bank for Rs
-	func:
-		0) Rd = Rs
-		1) ADD Rd = Rd + Rs
-		2) SUB Rd = Rd - Rs
-		3) SHL Rd = Rd << Rs & 31 (bits)
-		4) SHR Rd = Rd >> Rs & 31 (bits)
-		5) AND Rd = Rd and Rs
-		6) OR  Rd = Rd or  Rs
-		7) XOR Rd = Rd xor Rs
-		8) NOT Rd = ~Rd
-		9) MUL Rd = Rd * Rs
-		10) LD  Rd = SP
-		11) LD  Rd = LR
-		12) LD  SP = Rs
-		13) LD  LR = Rs
-		14) INT Rs, Rd; Rs - interrupt number, Rd - interrupt result
-		...
-		31)
+Imm(7) | func2(2) | Rd(4) | opcode(3)
 ```
 
-1) LD REG, IMM (8 bit Immediate operations)
+	func2:
+
+	0) BEQZ Rd, Imm; Rd == 0 ? PC = PC + signed(Imm)<<1; in instructions
+	1) BNEZ Rd, Imm; Rd != 0 ? PC = PC + signed(Imm)<<1; in instructions
+	2) BGTZ Rd, Imm; Rd >  0 ? PC = PC + signed(Imm)<<1; in instructions
+	3) BLTZ Rd, Imm; Rd <  0 ? PC = PC + signed(Imm)<<1; in instructions
+
+### LDI:
+Opcode: 5
+
 ```
-	LD.Byte Rd = IMM; func(1): bank, func(0): register byte number = 0 | 1 (To load high bytes use shift) 
+Imm(9) | Rd(4) | opcode(3)
 ```
 
-2) ALU REG, IMM (7 bit Immediate operations)
+	LDI Rd, [PC+Signed(Imm(9))<<1]; Imm in instructions (-512...511 instructions)
+
+### CALL\JMP\RET:
+Opcode: 6
+
 ```
-	func(2 bit) = register bank (0 or 1)
-	func(0-1 bits):
-		0) ADD/SUB: Rd = Rd + (signed(IMM))
-		1) SHL/SHR: Rd = << or >> signed(IMM & 31)
-		2) LDI Rd = [PC - IMM]; load 32 bit from address relative to PC, IMM in instructions (-128 ... 0 instructions)
-		3) DJNZ Rd, PC + signed(IMM); Rd-- if not zero, jump taken. IMM in instructions (-64 ... +63 instructions)
+Imm(7) | func2(2) | Rd(4) | opcode(3)
 ```
 
-3) LD\ST REG <-> MEM (2 Register operations)
+	func2:
+
+	0) CALL Imm(7), Rd; PC=PC+signed(Imm(7))<<2; Function aligned by 4 bytes; Rd=PC+2 return address; For default R14
+	1) CALL Rd		  ; PC=Rd. R14=PC+2
+	2) RET  Rd        ; PC=Rd. Also used as JMP Rd; For default used R14
+	3) JR   Imm(7)    ; PC=PC+signed(Imm(7))<<1; in instructions
+
+### INT\RETI\STS:
+Opcode: 7
+
 ```
-	MEM = Rd
-	B: 8 bit byte    alignment = 1
-	W: 16 bit word   alignment = 2
-	D: 32 bit dword  alignment = 4
-	Ex(0 bit) - register bank for Rd
-	Ex(1 bit) - register bank for Rs
-	func:
-		0) LD.B Rs, [Rd];
-		1) LD.W Rs, [Rd];
-		2) LD.D Rs, [Rd];
-		3) ST.B [Rd], Rs;
-		4) ST.W [Rd], Rs;
-		5) ST.D [Rd], Rs;
-		6) LD.B Rs, [Rd++];
-		7) LD.W Rs, [Rd++];
-		8) LD.D Rs, [Rd++];
-		9) ST.B [Rd++], Rs;
-		10) ST.W [Rd++], Rs;
-		11) ST.D [Rd++], Rs;
-		12) LD.B Rs, [Rd--];
-		13) LD.W Rs, [Rd--];
-		14) LD.D Rs, [Rd--];
-		15) ST.B [Rd--], Rs;
-		16) ST.W [Rd--], Rs;
-		17) ST.D [Rd--], Rs;
-		18) LD.B Rs, [Rd+R(2+Ex)];	R2-R5; Only Bank 0
-		19) ST.B [Rd+R(2+Ex)], Rs;	R2-R5; Only Bank 0
-		20) LD.W Rs, [Rd+R(2+Ex)];	R2-R5; Only Bank 0
-		21) ST.W [Rd+R(2+Ex)], Rs;	R2-R5; Only Bank 0
-		22) LD.D Rs, [Rd+R(2+Ex)];	R2-R5; Only Bank 0
-		23) ST.D [Rd+R(2+Ex)], Rs;	R2-R5; Only Bank 0
-		24)	PUSH Rs; ST.D [--SP], Rs
-		25) POP  Rd; LD.D Rd, [SP++]
-		26) PUSH LR; ST.D [--SP], LR
-		27) POP  LR; LD.D LR, [SP++]
+unused(7) | func2(2) | Rd(4) | opcode(3)
 ```
 
-4) LD\ST REG <-> MEM + IMM (3 Register operations)
-```
-	IMM = Ex(2)+Rx(3) = 5 bit = -16 ... +16 (0 not uzed, use opcode 3 instead) ; bytes for 8 bit acces, 32 bit dword for 32 bit access (-64...+64 bytes)
-	func:
-		0) LD.B Rd, [Rs + IMM]; 8bit access;
-		1) ST.B [Rs + IMM], Rd; 8bit access;
-		2) LD.D Rd, [Rs + IMM]; 32bit access;
-		3) ST.D [Rs + IMM], Rd; 32bit access;
-```
+	func2:
 
-5) JMP\CALL\RET Rd (3 Register operations)
-```
-	Address: Rd
-	Ex:
-		0) JMP func Rd;
-		1) CALL func Rd; LR = PC + 2; Return address + 1 (next instruction) 
-		2) RET  func;    PC = LR
-		3) Future extentions (RETI)
-	func: 
-		0) 
-		1) Rs == Rx
-		2) Rs != Rx
-		3) Rs >= Rx
-```
+	0) INT Rd; interrupt number Rd
+	1) RETI; return from interrupt
+	2) MOV Rd, EPC; Get EPC
+	3) MOV EPC, Rd: Set EPC register
 
-7) JMP RELATIVE (3 Register operations)
-```
-	Rd=0: JMP PC+signed(IMM); IMM = Rs(3)+Ex(2)+func(2)+Rx(3) = 10 bit in instructions (-512 ... +511 instructions)
-		JMP cond(Rd) Rs, Rx PC+signed(IMM); IMM = Ex(2)+func(2) = 4 bit in instructinos (-8 ... +7 instructions)
-		Rd=1: Rs == Rx
-		Rd=2: Rs != Rx
-		Rd=3: Rs >  Rx
-		Rd=4: Rs >= Rx
-		Rd=5: Rs <  Rx
-		Rd=6: Rs <= Rx
-		Rd=7: Future extension
-```
+	EPC register: PC of next instruction to execute after interrupt handler is finished
+	On interrupt EPC = PC + 2
+    STS register: bit0=IE (Enable Interrupts), bit1=Priv (User/Kernel)	
 
-8) CALL RELATIVE PC + IMM(signed) (13 bit Immediate operations); LR = PC + 2; Return address + 1 (next instruction) 
-```
-		IMM = -4K ... +4K instructions; IMM in instructions
-```
+	Interrupt vectors:
+	0x00000000 - Reset
+	0x00000002 - Timer
+	0x00000004 - Syscall (INT Rd)
+	0x00000006 - ...
+
+
+## ABI:
+
+	Arguments: R0-R5
+	Return: R0
+	Stack: R15
+	Link Register: R14. Link register should be pushed on stack and restored if subcall function occures
+	Function should restore R8-R13 if used
+	Constants used in function stored at function ends after ret, or begin (for near LDI). For default in the end.
+	If constants in start then each function starts with JR skipping constants. (Constants will be always in ICache (IMEM))
+	Stack:
+		PUSH: 
+			SUB R15, 4
+			STW [R15], Rd
+		POP:
+			LDW Rd, [R15]
+		    ADD R15, 4
+
+	Syscall: INT R0 - system function, R1-R5 arguments. Result: R0
