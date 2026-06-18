@@ -68,9 +68,9 @@ Imm(8) | func1(1) | Rd(4) | opcode(3)
 	func1:
 
 		0) MOVI Rd, Imm(8); Rd = 0(24) Imm(8)
-		1) MOVH Rd, Imm(8); Rd = Rd | (Imm(8) << 8)
+		1) MOVL Rd, Imm(8); Rd = (Rd << 8) | Imm(8)
 
-	MOVI and MOVH used to load 8 or 16 bit constants
+	MOVI and MOVL used to load constants. Any number (from 8 bit to 32 bit)
 
 ### ST\LD:
 Opcode: 3
