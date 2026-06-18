@@ -13,7 +13,7 @@ General purpose registers 32 bit: R0-R15
 | --------------- | ----------- | ------------------------------------------------ | ----------- |
 | 0               | [ALU REG REG](#alu-reg-reg) | ```notused(2)       func3(3)  Rs(4) Rd(4) opcode(3)``` | MOV,ADD,SUB,AND,OR,XOR,NOT,MUL|
 | 1               | [ALU Imm](#alu-imm)         | ```Imm(7)           func2(2)        Rd(4) opcode(3)``` | SHR,SHL,ADD,SUB |
-| 2               | [REG Imm](#reg-imm)         | ```Imm(8)           func1(1)        Rd(4) opcode(3)``` | MOVI,MOVH |
+| 2               | [REG Imm](#reg-imm)         | ```Imm(8)           func1(1)        Rd(4) opcode(3)``` | MOVI,MOVL |
 | 3               | [ST\LD](#stld)              | ```Imm(3) func22(1) func21(1) Rs(4) Rd(4) opcode(3)``` | LDB,LDW,STB,STW |
 | 4               | [BRANCH](#branch)           | ```Imm(7)           func2(2)        Rd(4) opcode(3)``` | BEQZ,BNEZ,BGTZ,BLTZ |
 | 5               | [LDI](#ldi)                 | ```Imm(9)                           Rd(4) opcode(3)``` | Load indirect 32 bit constant |
