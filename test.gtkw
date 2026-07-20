@@ -1,0 +1,43 @@
+[*]
+[*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
+[*] Sun Jul 19 19:20:59 2026
+[*]
+[dumpfile] "C:\Work\Projects\FPGA\risca\risca_tb.vcd"
+[dumpfile_mtime] "Sun Jul 19 19:07:25 2026"
+[dumpfile_size] 7162
+[savefile] "C:\Work\Projects\FPGA\risca\test.gtkw"
+[timestart] 0
+[size] 1447 658
+[pos] -1 -1
+*-15.000000 35000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] risca_tb.
+[sst_width] 197
+[signals_width] 266
+[sst_expanded] 1
+[sst_vpaned_height] 285
+@28
+risca_tb.cpu.clk
+@22
+risca_tb.cpu.pc[31:0]
+risca_tb.cpu.imem_addr[31:0]
+risca_tb.cpu.imem_data[15:0]
+risca_tb.cpu.if_instr[15:0]
+@24
+risca_tb.cpu.i_opcode[2:0]
+@28
+risca_tb.cpu.i_func1
+@22
+risca_tb.cpu.id_rd[3:0]
+risca_tb.cpu.id_rs[3:0]
+risca_tb.cpu.id_alu_in_a[31:0]
+@23
+risca_tb.cpu.id_alu_in_b[31:0]
+@24
+risca_tb.cpu.id_alu_op[2:0]
+@22
+risca_tb.cpu.ex_rd[3:0]
+risca_tb.cpu.ex_alu_out[31:0]
+risca_tb.cpu.mem_rd[3:0]
+risca_tb.cpu.mem_data_out[31:0]
+[pattern_trace] 1
+[pattern_trace] 0
