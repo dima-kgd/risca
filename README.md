@@ -11,7 +11,7 @@ General purpose registers 32 bit: R0-R15
 
 | Opcode (3 bits) | Type        | Format (16 bit)                                  | Description |
 | --------------- | ----------- | ------------------------------------------------ | ----------- |
-| 0               | [ALU REG REG](#alu-reg-reg) | ```notused(2)       func3(3)  Rs(4) Rd(4) opcode(3)``` | MOV,ADD,SUB,AND,OR,XOR,NOT,MUL|
+| 0               | [ALU REG REG](#alu-reg-reg) | ```unused(2)        func3(3)  Rs(4) Rd(4) opcode(3)``` | MOV,ADD,SUB,AND,OR,XOR,NOT,MUL|
 | 1               | [ALU Imm](#alu-imm)         | ```Imm(7)           func2(2)        Rd(4) opcode(3)``` | SHR,SHL,ADD,SUB |
 | 2               | [REG Imm](#reg-imm)         | ```Imm(8)           func1(1)        Rd(4) opcode(3)``` | MOVI,MOVL |
 | 3               | [ST\LD](#stld)              | ```Imm(3) func22(1) func21(1) Rs(4) Rd(4) opcode(3)``` | LDB,LDW,STB,STW |
@@ -42,7 +42,6 @@ notused(2) | func3(3) | Rs(4) | Rd(4) | opcode(3)
 	5) XOR Rd, Rs; Rd = Rd xor Rs
 	6) NOT Rd, Rs; Rd = ~Rs
 	7) MUL Rd, Rs; Rd = Rd * Rs
-	7?) CMP Rd, Rs; R13 = (Rd == Rs) ? 0 : (Rd < Rs) -1 : (Rd > Rs) 1
 	
 ### ALU Imm:
 Opcode: 1
@@ -67,7 +66,7 @@ Imm(8) | func1(1) | Rd(4) | opcode(3)
 
 	func1:
 
-		0) MOVI Rd, Imm(8); Rd = 0(24) Imm(8)
+		0) MOVI Rd, Imm(8); Rd = Imm(8)
 		1) MOVL Rd, Imm(8); Rd = (Rd << 8) | Imm(8)
 
 	MOVI and MOVL used to load constants. Any number (from 8 bit to 32 bit)
@@ -97,10 +96,10 @@ Imm(7) | func2(2) | Rd(4) | opcode(3)
 
 	func2:
 
-	0) BEQZ Rd, Imm; Rd == 0 ? PC = PC + signed(Imm)<<1; in instructions
-	1) BNEZ Rd, Imm; Rd != 0 ? PC = PC + signed(Imm)<<1; in instructions
-	2) BGTZ Rd, Imm; Rd >  0 ? PC = PC + signed(Imm)<<1; in instructions
-	3) BLTZ Rd, Imm; Rd <  0 ? PC = PC + signed(Imm)<<1; in instructions
+	0) BEQZ Rd, Imm(7); Rd == 0 ? PC = PC + signed(Imm)<<1; in instructions
+	1) BNEZ Rd, Imm(7); Rd != 0 ? PC = PC + signed(Imm)<<1; in instructions
+	2) BGTZ Rd, Imm(7); Rd >  0 ? PC = PC + signed(Imm)<<1; in instructions
+	3) BLTZ Rd, Imm(7); Rd <  0 ? PC = PC + signed(Imm)<<1; in instructions
 
 ### LDI:
 Opcode: 5
@@ -109,7 +108,7 @@ Opcode: 5
 Imm(9) | Rd(4) | opcode(3)
 ```
 
-	LDI Rd, [PC+Signed(Imm(9))<<1]; Imm in instructions (-512...511 instructions)
+	LDI Rd, [PC+Signed(Imm(9))<<1]; Imm in instructions (-256...255 instructions)
 
 ### CALL\JMP\RET:
 Opcode: 6
@@ -120,10 +119,10 @@ Imm(7) | func2(2) | Rd(4) | opcode(3)
 
 	func2:
 
-	0) CALL Imm(7), Rd; PC=PC+signed(Imm(7))<<2; Function aligned by 4 bytes; Rd=PC+2 return address; For default R14
-	1) CALL Rd		  ; PC=Rd. R14=PC+2
-	2) RET  Rd        ; PC=Rd. Also used as JMP Rd; For default used R14
-	3) JR   Imm(7)    ; PC=PC+signed(Imm(7))<<1; in instructions
+	0) CALL (Imm(7) | Rd(4)) 11 bit ; PC=PC+signed((Imm(7) | Rd(4)))<<2; Function aligned by 4 bytes; R14=PC+2 return address
+	1) CALL Rd         ; PC=Rd. R14=PC+2 return address
+	2) RET  Rd         ; PC=Rd. Also used as JMP Rd; For default used R14
+	3) JR   (Imm(7) | Rd(4)) 11 bit ; PC=PC+signed(Imm(7) | Rd(4))<<1; in instructions
 
 ### INT\RETI\STS:
 Opcode: 7
