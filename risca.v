@@ -53,11 +53,11 @@ module risca (
     localparam ALU_SHL   = 4'd8;
     localparam ALU_SHR   = 4'd9;
     localparam ALU_MOVI   = 4'd10;
-    localparam ALU_MOVH   = 4'd11;
+    localparam ALU_MOVL   = 4'd11;
 
     // MOVI and MOVH
     localparam MOVI_MOV  = 3'd0;
-    localparam MOVH_MOV  = 3'd1;
+    localparam MOVL_MOV  = 3'd1;
 
     // ALU IMM 
     localparam ALU_SHLI   = 2'd0;
@@ -154,7 +154,7 @@ module risca (
                     id_alu_in_b <= {{24{i_imm8[7]}}, i_imm8}; // sign-extend immediate
                     case (i_func1)
                         MOVI_MOV: id_alu_op <= ALU_MOVI;
-                        MOVH_MOV: id_alu_op <= ALU_MOVH;
+                        MOVL_MOV: id_alu_op <= ALU_MOVL;
                     endcase
                 end
             endcase
@@ -201,7 +201,7 @@ module risca (
                 ALU_SHL: ex_alu_out <= fwd_in_a << fwd_in_b[4:0];
                 ALU_SHR: ex_alu_out <= fwd_in_a >> fwd_in_b[4:0];
                 ALU_MOVI: ex_alu_out <= fwd_in_b;
-                ALU_MOVH: ex_alu_out <= {fwd_in_a[23:0], fwd_in_b[7:0]}; // shift left 8 bits and insert immediate
+                ALU_MOVL: ex_alu_out <= {fwd_in_a[23:0], fwd_in_b[7:0]}; // shift left 8 bits and insert immediate
             endcase
             ex_rd <= id_rd;
             ex_opcode <= id_opcode;

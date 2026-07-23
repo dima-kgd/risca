@@ -85,6 +85,7 @@ module risca_tb;
         imem[6]  = `MOV(5, 4); $display(" imem[6] = %h", imem[6]);        // 0x0C: R5 = R4 = 10
         imem[7]  = `SHL(5, 1); $display(" imem[7] = %h", imem[7]);        // 0x0E: R5 = 10 << 1 = 20
         imem[8]  = `ADDI(5, 2); $display(" imem[8] = %h", imem[8]);        // 0x10: R5 = 20 + 2 = 22
+        imem[9]  = `MOVL(5, 255); $display(" imem[9] = %h", imem[9]);        // 0x12: R5 = (22 << 8) + 255 = 5887
 
         clk = 0;
         rst_n = 0;
@@ -97,9 +98,9 @@ module risca_tb;
         $display("R2  = %0d (expected 20)",  cpu.regfile[2]);
         $display("R3  = %0d (expected 30)",  cpu.regfile[3]);
         $display("R4  = %0d (expected 10)",  cpu.regfile[4]);
-        $display("R5  = %0d (expected 22)",  cpu.regfile[5]);
+        $display("R5  = %0d (expected 5887)",  cpu.regfile[5]);
         if (cpu.regfile[1] == 10 && cpu.regfile[2] == 20 &&
-            cpu.regfile[3] == 30 && cpu.regfile[4] == 10 && cpu.regfile[5] == 22)
+            cpu.regfile[3] == 30 && cpu.regfile[4] == 10 && cpu.regfile[5] == 5887)
             $display("*** TEST PASSED ***");
         else
             $display("*** TEST FAILED ***");

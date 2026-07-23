@@ -1,5 +1,5 @@
 $date
-	Thu Jul 23 18:33:54 2026
+	Thu Jul 23 18:46:06 2026
 $end
 $version
 	Icarus Verilog
@@ -59,8 +59,8 @@ $var parameter 4 L ALU_ADD $end
 $var parameter 2 M ALU_ADDI $end
 $var parameter 4 N ALU_AND $end
 $var parameter 4 O ALU_MOV $end
-$var parameter 4 P ALU_MOVH $end
-$var parameter 4 Q ALU_MOVI $end
+$var parameter 4 P ALU_MOVI $end
+$var parameter 4 Q ALU_MOVL $end
 $var parameter 4 R ALU_MUL $end
 $var parameter 4 S ALU_NOT $end
 $var parameter 4 T ALU_OR $end
@@ -71,8 +71,8 @@ $var parameter 2 X ALU_SHRI $end
 $var parameter 4 Y ALU_SUB $end
 $var parameter 2 Z ALU_SUBI $end
 $var parameter 4 [ ALU_XOR $end
-$var parameter 3 \ MOVH_MOV $end
-$var parameter 3 ] MOVI_MOV $end
+$var parameter 3 \ MOVI_MOV $end
+$var parameter 3 ] MOVL_MOV $end
 $var parameter 3 ^ OP_ALU_RI $end
 $var parameter 3 _ OP_ALU_RR $end
 $var parameter 3 ` OP_BRANCH $end
@@ -114,8 +114,8 @@ b110 a
 b100 `
 b0 _
 b1 ^
-b0 ]
-b1 \
+b1 ]
+b0 \
 b101 [
 b11 Z
 b10 Y
@@ -126,8 +126,8 @@ b1000 U
 b100 T
 b110 S
 b111 R
-b1010 Q
-b1011 P
+b1011 Q
+b1010 P
 b0 O
 b11 N
 b10 M
@@ -429,8 +429,8 @@ b1010 B
 b10 H
 b101 E
 b10 F
-bx &
-bx .
+b1111111110101010 &
+b1111111110101010 .
 b10100101001 r
 b10010 '
 b10010 A
@@ -452,14 +452,15 @@ b110100000 x
 #105000
 b10 J
 b10100 K
-bx D
-bx C
-bx B
-bx G
-bx H
-xI
-bx E
-bx F
+b10 D
+b1111 B
+b111 G
+b11 H
+1I
+b11111111 E
+b1111111 F
+bx &
+bx .
 b1010 :
 b1000100100000 x
 b101 v
@@ -471,7 +472,7 @@ b1 l
 b10100101001 n
 b10 k
 b1010 q
-bx r
+b1111111110101010 r
 b10100 '
 b10100 A
 b10100 w
@@ -479,19 +480,26 @@ b10100 w
 #110000
 0(
 #115000
-b0x0xx0 J
-x/
-b0x0xx0 K
+b11111111111111111111111111111111 J
+bx D
+bx C
+bx B
+bx G
+bx H
+xI
+bx E
+bx F
+b10110 K
+bx r
 b10110 '
 b10110 A
 b10110 w
-bx n
-b0 k
-bx m
-bx p
-bx q
-x@
-bx o
+b1011 l
+b1111111110101010 n
+b11111111111111111111111111111111 k
+b111 m
+b1111 q
+b10 o
 b10110 f
 b10100101001 g
 b1 u
@@ -503,16 +511,23 @@ b1000101000 x
 #120000
 0(
 #125000
-bx K
-bx J
+b0x0xx0xxxxxxxx J
+b0x0xx0xxxxxxxx K
+x/
 b10100 ;
 b1000101001 x
 b10110 s
 b10100101001 t
-bx h
-bx i
-bx f
-bx g
+b10 h
+b1011011111111 f
+b1111111110101010 g
+bx n
+b0 k
+bx m
+bx p
+bx q
+x@
+bx o
 b11000 '
 b11000 A
 b11000 w
@@ -520,19 +535,32 @@ b11000 w
 #130000
 0(
 #135000
+b0x0xx0xxxxxxxxxxxxxxxx K
+b0x0xx0xxxxxxxxxxxxxxxx J
 b11010 '
 b11010 A
 b11010 w
-bx u
-bx v
-bx t
+bx h
+bx i
+b0x0xx0xxxxxxxxxxxxxxxx f
+bx g
+b10 u
+b1011011111111 s
+b1111111110101010 t
 b10110 ;
 b10100101001 x
 1(
 #140000
 0(
 #145000
-bx x
+b0x0xx0xxxxxxxxxxxxxxxxxxxxxxxx K
+b0x0xx0xxxxxxxxxxxxxxxxxxxxxxxx J
+b1011011111111 ;
+b1111111110101010 x
+bx u
+bx v
+bx t
+b0x0xx0xxxxxxxxxxxxxxxxxxxxxxxx f
 b11100 '
 b11100 A
 b11100 w
@@ -540,9 +568,13 @@ b11100 w
 #150000
 0(
 #155000
+bx K
+bx J
 b11110 '
 b11110 A
 b11110 w
+bx f
+bx x
 1(
 #160000
 0(

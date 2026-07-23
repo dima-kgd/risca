@@ -10,4 +10,5 @@ if %errorlevel% neq 0 (
 )
 echo Running simulation...
 vvp %TB_NAME%.vvp
-
+echo Opening GTKWave...
+gtkwave %TB_NAME%.vcd test.gtkw
