@@ -2,14 +2,16 @@
 
 `define MOVI(rd, imm)  (((imm) << 8) | (1'b0 << 7) | ((rd) << 3) | 3'b010)
 `define MOVL(rd, imm)  (((imm) << 8) | (1'b1 << 7) | ((rd) << 3) | 3'b010)
-`define MOV(rd, rs)    ((3'b000 << 11) | ((rs) << 7) | ((rd) << 3) | 3'b000)
-`define ADD(rd, rs)    ((3'b001 << 11) | ((rs) << 7) | ((rd) << 3) | 3'b000)
-`define SUB(rd, rs)    ((3'b010 << 11) | ((rs) << 7) | ((rd) << 3) | 3'b000)
-`define AND(rd, rs)    ((3'b011 << 11) | ((rs) << 7) | ((rd) << 3) | 3'b000)
-`define OR(rd, rs)     ((3'b100 << 11) | ((rs) << 7) | ((rd) << 3) | 3'b000)
-`define XOR(rd, rs)    ((3'b101 << 11) | ((rs) << 7) | ((rd) << 3) | 3'b000)
-`define NOT(rd, rs)    ((3'b110 << 11) | ((rs) << 7) | ((rd) << 3) | 3'b000)
-`define MUL(rd, rs)    ((3'b111 << 11) | ((rs) << 7) | ((rd) << 3) | 3'b000)
+`define MOV(rd, rs)    ((4'b0000 << 11) | ((rs) << 7) | ((rd) << 3) | 3'b000)
+`define ADD(rd, rs)    ((4'b0001 << 11) | ((rs) << 7) | ((rd) << 3) | 3'b000)
+`define SUB(rd, rs)    ((4'b0010 << 11) | ((rs) << 7) | ((rd) << 3) | 3'b000)
+`define AND(rd, rs)    ((4'b0011 << 11) | ((rs) << 7) | ((rd) << 3) | 3'b000)
+`define OR(rd, rs)     ((4'b0100 << 11) | ((rs) << 7) | ((rd) << 3) | 3'b000)
+`define XOR(rd, rs)    ((4'b0101 << 11) | ((rs) << 7) | ((rd) << 3) | 3'b000)
+`define NOT(rd, rs)    ((4'b0110 << 11) | ((rs) << 7) | ((rd) << 3) | 3'b000)
+`define MUL(rd, rs)    ((4'b0111 << 11) | ((rs) << 7) | ((rd) << 3) | 3'b000)
+`define SLT(rd, rs)    ((4'b1000 << 11) | ((rs) << 7) | ((rd) << 3) | 3'b000)
+`define SLTU(rd, rs)   ((4'b1001 << 11) | ((rs) << 7) | ((rd) << 3) | 3'b000)
 `define ADDI(rd, imm)  (((imm) << 9) | (2'b10 << 7) | ((rd) << 3) | 3'b001)
 `define SUBI(rd, imm)  (((imm) << 9) | (2'b11 << 7) | ((rd) << 3) | 3'b001)
 `define SHL(rd, imm)   (((imm) << 9) | (2'b00 << 7) | ((rd) << 3) | 3'b001)
@@ -18,10 +20,8 @@
 `define STW(rd, rs, imm) (((imm) << 13) | (1'b1 << 12) | (1'b1 << 11) | ((rs) << 7) | ((rd) << 3) | 3'b011)
 `define LDB(rd, rs, imm) (((imm) << 13) | (1'b0 << 12) | (1'b0 << 11) | ((rs) << 7) | ((rd) << 3) | 3'b011)
 `define STB(rd, rs, imm) (((imm) << 13) | (1'b0 << 12) | (1'b1 << 11) | ((rs) << 7) | ((rd) << 3) | 3'b011)
-`define BEQZ(rd, imm)  (((imm) << 9) | (2'b00 << 7) | ((rd) << 3) | 3'b100)
-`define BNEZ(rd, imm)  (((imm) << 9) | (2'b01 << 7) | ((rd) << 3) | 3'b100)
-`define BGTZ(rd, imm)  (((imm) << 9) | (2'b10 << 7) | ((rd) << 3) | 3'b100)
-`define BLTZ(rd, imm)  (((imm) << 9) | (2'b11 << 7) | ((rd) << 3) | 3'b100)
+`define BEQZ(rd, imm)  (((imm) << 8) | (1'b0 << 7) | ((rd) << 3) | 3'b100)
+`define BNEZ(rd, imm)  (((imm) << 8) | (1'b1 << 7) | ((rd) << 3) | 3'b100)
 `define CALLI(rd, imm) (((imm) << 9) | (2'b00 << 7) | ((rd) << 3) | 3'b110)
 `define CALLR(rd)      ((2'b01 << 7) | ((rd) << 3) | 3'b110)
 `define RET(rd)        ((2'b10 << 7) | ((rd) << 3) | 3'b110)
@@ -86,6 +86,9 @@ module risca_tb;
         imem[7]  = `SHL(5, 1); $display(" imem[7] = %h", imem[7]);        // 0x0E: R5 = 10 << 1 = 20
         imem[8]  = `ADDI(5, 2); $display(" imem[8] = %h", imem[8]);        // 0x10: R5 = 20 + 2 = 22
         imem[9]  = `MOVL(5, 255); $display(" imem[9] = %h", imem[9]);        // 0x12: R5 = (22 << 8) + 255 = 5887
+        imem[10]  = `MOV(6, 4); $display(" imem[10] = %h", imem[10]);        // 0x0C: R6 = R4 = 10
+        imem[11]  = `SLTU(6, 5); $display(" imem[11] = %h", imem[11]);        // 0x0E: R6 = R6 < R5 = 10 < 5887 = 1
+
 
         clk = 0;
         rst_n = 0;
@@ -99,8 +102,10 @@ module risca_tb;
         $display("R3  = %0d (expected 30)",  cpu.regfile[3]);
         $display("R4  = %0d (expected 10)",  cpu.regfile[4]);
         $display("R5  = %0d (expected 5887)",  cpu.regfile[5]);
+        $display("R6  = %0d (expected 1)",   cpu.regfile[6]);
         if (cpu.regfile[1] == 10 && cpu.regfile[2] == 20 &&
-            cpu.regfile[3] == 30 && cpu.regfile[4] == 10 && cpu.regfile[5] == 5887)
+            cpu.regfile[3] == 30 && cpu.regfile[4] == 10 && 
+            cpu.regfile[5] == 5887 && cpu.regfile[6] == 1)
             $display("*** TEST PASSED ***");
         else
             $display("*** TEST FAILED ***");

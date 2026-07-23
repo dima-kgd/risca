@@ -50,10 +50,12 @@ module risca (
     localparam ALU_XOR   = 4'd5;
     localparam ALU_NOT   = 4'd6;
     localparam ALU_MUL   = 4'd7;
-    localparam ALU_SHL   = 4'd8;
-    localparam ALU_SHR   = 4'd9;
-    localparam ALU_MOVI   = 4'd10;
-    localparam ALU_MOVL   = 4'd11;
+    localparam ALU_SLT   = 4'd8;
+    localparam ALU_SLTU  = 4'd9;
+    localparam ALU_SHL   = 4'd10;
+    localparam ALU_SHR   = 4'd11;
+    localparam ALU_MOVI   = 4'd12;
+    localparam ALU_MOVL   = 4'd13;
 
     // MOVI and MOVH
     localparam MOVI_MOV  = 3'd0;
@@ -98,7 +100,7 @@ module risca (
     wire [2:0]  i_opcode = if_instr[2:0];
     wire [3:0]  i_rd     = if_instr[6:3];
     wire [3:0]  i_rs     = if_instr[10:7];
-    wire [2:0]  i_func3  = if_instr[13:11];
+    wire [3:0]  i_func4  = if_instr[14:11];
     wire [1:0]  i_func2  = if_instr[8:7];
     wire        i_func1  = if_instr[7];
     wire [7:0]  i_imm8   = if_instr[15:8];
@@ -107,7 +109,7 @@ module risca (
     reg [2:0] id_opcode;
     reg [3:0] id_rs;
     reg [3:0] id_rd;
-    reg [2:0] id_func3;
+    reg [2:0] id_func4;
 
     reg [31:0] id_alu_in_a;
     reg [31:0] id_alu_in_b;
@@ -118,7 +120,7 @@ module risca (
             id_opcode <= 3'd0;
             id_rs <= 4'd0;
             id_rd <= 4'd0;
-            id_func3 <= 3'd0;
+            id_func4 <= 3'd0;
             id_alu_in_a <= 32'd0;
             id_alu_in_b <= 32'd0;
             id_alu_op <= 3'd0;
@@ -128,7 +130,7 @@ module risca (
             id_opcode <= i_opcode;
             id_rs <= i_rs;
             id_rd <= i_rd;
-            id_func3 <= i_func3;
+            id_func4 <= i_func4;
             id_alu_in_a <= 32'd0;
             id_alu_in_b <= 32'd0;
             id_instr <= if_instr; //debug
@@ -136,12 +138,12 @@ module risca (
                 OP_ALU_RR: begin
                     id_alu_in_a <= regfile[i_rd];
                     id_alu_in_b <= regfile[i_rs];
-                    id_alu_op <= i_func3;
+                    id_alu_op <= i_func4;
                 end
                 OP_ALU_RI: begin
                     id_alu_in_a <= regfile[i_rd];
                     id_alu_in_b <= {{24{i_imm7[6]}}, i_imm7};
-                    id_alu_op <= i_func3;
+                    id_alu_op <= i_func4;
                     case (i_func2) 
                         ALU_SHLI: id_alu_op <= ALU_SHL;
                         ALU_SHRI: id_alu_op <= ALU_SHR;
@@ -198,6 +200,8 @@ module risca (
                 ALU_XOR: ex_alu_out <= fwd_in_a ^ fwd_in_b;
                 ALU_NOT: ex_alu_out <= ~fwd_in_b;
                 ALU_MUL: ex_alu_out <= fwd_in_a * fwd_in_b;
+                ALU_SLT: ex_alu_out <= ($signed(fwd_in_a) < $signed(fwd_in_b)) ? 32'd1 : 32'd0;
+                ALU_SLTU: ex_alu_out <= (fwd_in_a < fwd_in_b) ? 32'd1 : 32'd0;
                 ALU_SHL: ex_alu_out <= fwd_in_a << fwd_in_b[4:0];
                 ALU_SHR: ex_alu_out <= fwd_in_a >> fwd_in_b[4:0];
                 ALU_MOVI: ex_alu_out <= fwd_in_b;
