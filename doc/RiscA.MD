@@ -11,7 +11,7 @@ General purpose registers 32 bit: R0-R15
 
 | Opcode (3 bits) | Type        | Format (16 bit)                                  | Description |
 | --------------- | ----------- | ------------------------------------------------ | ----------- |
-| 0               | [ALU REG REG](#alu-reg-reg) | ```unused(2)        func3(3)  Rs(4) Rd(4) opcode(3)``` | MOV,ADD,SUB,AND,OR,XOR,NOT,MUL|
+| 0               | [ALU REG REG](#alu-reg-reg) | ```unused(1)        func4(4)  Rs(4) Rd(4) opcode(3)``` | MOV,ADD,SUB,AND,OR,XOR,NOT,MUL|
 | 1               | [ALU Imm](#alu-imm)         | ```Imm(7)           func2(2)        Rd(4) opcode(3)``` | SHR,SHL,ADD,SUB |
 | 2               | [REG Imm](#reg-imm)         | ```Imm(8)           func1(1)        Rd(4) opcode(3)``` | MOVI,MOVL |
 | 3               | [ST\LD](#stld)              | ```Imm(3) func22(1) func21(1) Rs(4) Rd(4) opcode(3)``` | LDB,LDW,STB,STW |
@@ -28,11 +28,11 @@ General purpose registers 32 bit: R0-R15
 Opcode: 0
 
 ```
-notused(2) | func3(3) | Rs(4) | Rd(4) | opcode(3)
+notused(1) | func4(4) | Rs(4) | Rd(4) | opcode(3)
 ```
 
 	NOP is MOV R0, R0 - 0x0000 hex
-	func3:
+	func4:
 
 	0) MOV Rd, Rs; Rd = Rs
 	1) ADD Rd, Rs; Rd = Rd + Rs
@@ -42,6 +42,10 @@ notused(2) | func3(3) | Rs(4) | Rd(4) | opcode(3)
 	5) XOR Rd, Rs; Rd = Rd xor Rs
 	6) NOT Rd, Rs; Rd = ~Rs
 	7) MUL Rd, Rs; Rd = Rd * Rs
+	8) SLT Rd, Rs; Rd = (Rd < Rs) ? 1 : 0 (signed)
+	9) SLTU Rd, Rs; Rd = (Rd < Rs) ? 1 : 0 (unsigned)
+	...
+	unused
 	
 ### ALU Imm:
 Opcode: 1
