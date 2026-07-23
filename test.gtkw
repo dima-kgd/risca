@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
-[*] Sun Jul 19 19:20:59 2026
+[*] Thu Jul 23 16:19:31 2026
 [*]
-[dumpfile] "C:\Work\Projects\FPGA\risca\risca_tb.vcd"
-[dumpfile_mtime] "Sun Jul 19 19:07:25 2026"
-[dumpfile_size] 7162
-[savefile] "C:\Work\Projects\FPGA\risca\test.gtkw"
+[dumpfile] "C:\Work\FPGA\risca\risca_tb.vcd"
+[dumpfile_mtime] "Thu Jul 23 16:08:31 2026"
+[dumpfile_size] 9029
+[savefile] "C:\Work\FPGA\risca\test.gtkw"
 [timestart] 0
-[size] 1447 658
-[pos] -1 -1
-*-15.000000 35000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[size] 1296 889
+[pos] -35 -35
+*-15.000000 65000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] risca_tb.
 [sst_width] 197
 [signals_width] 266
@@ -24,20 +24,43 @@ risca_tb.cpu.imem_data[15:0]
 risca_tb.cpu.if_instr[15:0]
 @24
 risca_tb.cpu.i_opcode[2:0]
+@22
+risca_tb.cpu.i_rd[3:0]
+risca_tb.cpu.i_rs[3:0]
 @28
 risca_tb.cpu.i_func1
+@24
+risca_tb.cpu.i_func2[1:0]
+risca_tb.cpu.i_func3[2:0]
+risca_tb.cpu.i_imm7[6:0]
+risca_tb.cpu.i_imm8[7:0]
+@23
+risca_tb.cpu.id_instr[15:0]
+@24
+risca_tb.cpu.id_opcode[2:0]
 @22
 risca_tb.cpu.id_rd[3:0]
 risca_tb.cpu.id_rs[3:0]
-risca_tb.cpu.id_alu_in_a[31:0]
-@23
-risca_tb.cpu.id_alu_in_b[31:0]
 @24
-risca_tb.cpu.id_alu_op[2:0]
+risca_tb.cpu.id_alu_in_a[31:0]
+risca_tb.cpu.id_alu_in_b[31:0]
+risca_tb.cpu.id_alu_op[3:0]
 @22
+risca_tb.cpu.ex_instr[15:0]
 risca_tb.cpu.ex_rd[3:0]
+@24
 risca_tb.cpu.ex_alu_out[31:0]
+@22
+risca_tb.cpu.mem_instr[15:0]
 risca_tb.cpu.mem_rd[3:0]
+@24
 risca_tb.cpu.mem_data_out[31:0]
+@22
+risca_tb.cpu.wb_instr[15:0]
+@24
+risca_tb.cpu.r1[31:0]
+risca_tb.cpu.r2[31:0]
+risca_tb.cpu.r3[31:0]
+risca_tb.cpu.r4[31:0]
 [pattern_trace] 1
 [pattern_trace] 0
